@@ -15,18 +15,77 @@ To solve this problem. Open up the CSV file in libreoffice or Excel and resave t
 file = "path to CSV file"
 data = Vicon.Vicon(file)
 markers = data.get_markers()
-markers.smart_sort()
+markers.smart_sort() # sort the markers into bodies by the names 
 markers.play()
 ```
 
 
-## Create rigid transforms
+## Get rigid body
+Rigid bodies are organized  by marker then frame. 
+The markers are of type Point. 
 
-To create transform from the global frame to a rigid body. 
 ```python
 file = "path to CSV file"
 data = Vicon.Vicon(file)
 markers = data.get_markers()
-markers.smart_sort()
-markers.play()
+markers.smart_sort() # optional param to remove subject name
+shank_frame = markers.get_rigid_body("name of body") # returns an array of markers 
+## Get the X corr of a marker 2 in frame 100
+x = shank_frame[2][100].x
 ```
+
+
+## Get rigid body transform
+Rigid bodies are organized  by marker then frame. 
+The markers are of type Point. 
+
+```python
+file = "path to CSV file"
+data = Vicon.Vicon(file)
+markers = data.get_markers()
+markers.smart_sort() # optional param to remove subject name
+
+# Do severial bodies, use the marker location on the rigidbody
+frames["hip"] = [core.Point(0.0, 0.0, 0.0),
+                 core.Point(70.0, 0, 0.0),
+                 core.Point(0, 42.0, 0),
+                 core.Point(35.0, 70.0, 0.0)]
+
+frames["RightThigh"] = [core.Point(0.0, 0.0, 0.0),
+                        core.Point(56.0, 0, 0.0),
+                        core.Point(0, 49.0, 0),
+                        core.Point(56.0, 63.0, 0.0)]
+
+frames["RightShank"] = [core.Point(0.0, 0.0, 0.0),
+                        core.Point(56.0, 0, 0.0),
+                        core.Point(0, 42.0, 0),
+                        core.Point(56.0, 70.0, 0.0)]
+
+markers.auto_make_transform(frames)
+
+
+# Get just one transform and the RMSE error 
+# Can be used to get the transformation between ANY two sets of markers 
+ m = markers.get_rigid_body("ben:hip")
+ f = [m[0][frame], m[1][frame], m[2][frame], m[3][frame]]
+ T, err = Markers.cloud_to_cloud(hip_marker, f)
+```
+
+## Get other synced sensors
+
+```python
+
+file = "path to CSV file"
+data = Vicon.Vicon(file)
+markers = data.get_markers()
+markers.smart_sort() # optional param to remove subject name
+markers._make_Accelerometers()
+markers._make_EMGs()
+markers._make_force_plates()
+markers._make_IMUs()
+markers._make_marker_trajs()
+
+```
+
+
+
