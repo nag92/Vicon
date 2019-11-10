@@ -1,18 +1,11 @@
 import csv
-
 import Accel
 import EMG
 import ForcePlate
 import IMU
 import ModelOutput
 import Markers
-from collections import namedtuple
 
-Point = namedtuple('Point', 'x y z')
-Newton = namedtuple('Newton', 'angle force moment power')
-Data = namedtuple('Data', 'data time')
-Side = namedtuple("Side", "left right")
-Leg = namedtuple("Leg", "hip knee ankle" )
 
 class Vicon(object):
 
@@ -27,12 +20,12 @@ class Vicon(object):
         self._IMUs = {}
         self._accels = {}
         self.data_dict = self.open_vicon_file(self._file_path, self.output_names)
-        # self._make_Accelerometers()
-        # self._make_EMGs()
-        # self._make_force_plates()
-        # self._make_IMUs()
+        self._make_Accelerometers()
+        self._make_EMGs()
+        self._make_force_plates()
+        self._make_IMUs()
         self._make_marker_trajs()
-        #self._make_model()
+        self._make_model()
         # self._length = len(self.get_model_output().get_right_joint("Hip").angle.x)
 
     def _find_number_of_frames(self, col):
@@ -239,19 +232,26 @@ class Vicon(object):
         :return: None
         """
         if "Devices" in self.data_dict:
-            sensors = self.data_dict["Devices"]
-            if "Force_Plate" in sensors:
-                keys = self._filter_dict(sensors, 'Force_Plate')  # + ['Combined Moment'] + ['Combined CoP']
 
-                self._force_plates[1] = ForcePlate.ForcePlate("Force_Plate_1", sensors["Force_Plate__Force_1"],
+            sensors = self.data_dict["Devices"]
+            keys = self._filter_dict(sensors, 'Force_Plate')  # + ['Combined Moment'] + ['Combined CoP']
+
+            if any("Force_Plate" in word for word in keys) :
+
+                self._force_plates[1] = ForcePlate.ForcePlate("Force_Plate_1",
+                                                              sensors["Force_Plate__Force_1"],
                                                               sensors["Force_Plate__Moment_1"])
 
-                self._force_plates[2] = ForcePlate.ForcePlate("Force_Plate_2", sensors["Force_Plate__Force_2"],
+                self._force_plates[2] = ForcePlate.ForcePlate("Force_Plate_2",
+                                                              sensors["Force_Plate__Force_2"],
                                                               sensors["Force_Plate__Moment_2"])
             else:
                 print "No force plates"
         else:
             print "No Devices"
+
+    def _make_markers(self):
+        markers = self.data_dict["Trajectories"]
 
     def _make_EMGs(self):
         """
@@ -334,7 +334,8 @@ class Vicon(object):
         return data
 
     def _seperate_csv_sections(self, all_data):
-        print all_data[0][0]
+        """"""
+
         raw_col = [row[0] for row in all_data]
         fitlered_col = [item for item in raw_col if not item.isdigit()]
         fitlered_col = filter(lambda a: a != 'Frame', fitlered_col)
@@ -355,7 +356,12 @@ class Vicon(object):
                     [i for i in name.replace("Subject", "").replace(":", "").replace("|", "") if
                      not i.isdigit()]).strip()
                 fixed_names.append(fixed)
-                continue
+
+            elif  ":" in name:
+                print name
+                index = name.index(":")
+                print name[index+1:]
+                fixed_names.append(name[index+1:])
 
             elif "AMTI" in name:
 
@@ -400,6 +406,7 @@ class Vicon(object):
 
         # column_names = raw_data[start + 2]
         remove_numbers = lambda str: ''.join([i for i in str if not i.isdigit()])
+
         axis = map(remove_numbers, raw_data[start + 3])
         unit = raw_data[start + 4]
 
@@ -411,6 +418,7 @@ class Vicon(object):
             else:
                 if len(name) > 0:
                     current_name = name
+
                     data[current_name] = {}
                 dir = axis[index]
                 indices[(current_name, dir)] = index
@@ -433,8 +441,6 @@ class Vicon(object):
                     sub_value["data"].append(val)
 
         return data
-
-
 
 
 if __name__ == '__main__':
