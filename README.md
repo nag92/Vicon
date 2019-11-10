@@ -3,9 +3,23 @@
 A package to read in Vicon data for analysis. This package can be used to read in a CSV file generated from 
 the Vicon motion capture system
 
-##NOTE
+## NOTE
 There is a strange bug when reading in the file. It will throw and error if you try to read in the raw file. 
 To solve this problem. Open up the CSV file in libreoffice or Excel and resave the file. Make sure its a CSV file. 
+
+## How to use
+
+## Namped tuples
+This package used named tuples for easy and consitant access. The has the following namped tuples. 
+```python
+Point = namedtuple('Point', 'x y z')
+Newton = namedtuple('Newton', 'angle force moment power')
+Data = namedtuple('Data', 'data time')
+Side = namedtuple("Side", "left right")
+Leg = namedtuple("Leg", "hip knee ankle" )
+
+```
+
 
 
 ### Playing the markers
@@ -20,7 +34,7 @@ markers.play()
 ```
 
 
-## Get rigid body
+### Get rigid body
 Rigid bodies are organized  by marker then frame. 
 The markers are of type Point. 
 
@@ -35,7 +49,7 @@ x = shank_frame[2][100].x
 ```
 
 
-## Get rigid body transform
+### Get rigid body transform
 Rigid bodies are organized  by marker then frame. 
 The markers are of type Point. 
 
@@ -71,7 +85,7 @@ markers.auto_make_transform(frames)
  T, err = Markers.cloud_to_cloud(hip_marker, f)
 ```
 
-## Get model outputs 
+### Get model outputs 
 only works with lowerbody model currently
 
 ```python
@@ -82,7 +96,7 @@ model = data.get_model_output()
 model.get_left_leg().hip.angle.x
 ```
 
-## Get force plates
+### Get force plates
 
 ```python
 from Vicon import Vicon
