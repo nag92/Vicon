@@ -85,6 +85,9 @@ model.get_left_leg().hip.angle.x
 ## Get force plates
 
 ```python
+from Vicon import Vicon
+file = "path to CSV file"
+data = Vicon.Vicon(file)
 data = Vicon.Vicon("/home/nathaniel/git/Gait_Analysis_Toolkit/testing_data/stairclimb03.csv")
 fp = data.get_force_plate(1).get_forces() # pass in 1 or 2 to get the foce plates
 ```
