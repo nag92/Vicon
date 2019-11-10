@@ -71,21 +71,22 @@ markers.auto_make_transform(frames)
  T, err = Markers.cloud_to_cloud(hip_marker, f)
 ```
 
-## Get other synced sensors
+## Get model outputs 
+only works with lowerbody model currently
 
 ```python
-
+from Vicon import Vicon
 file = "path to CSV file"
 data = Vicon.Vicon(file)
-markers = data.get_markers()
-markers.smart_sort() # optional param to remove subject name
-markers._make_Accelerometers()
-markers._make_EMGs()
-markers._make_force_plates()
-markers._make_IMUs()
-markers._make_marker_trajs()
-
+model = data.get_model_output()
+model.get_left_leg().hip.angle.x
 ```
 
+## Get force plates
+
+```python
+data = Vicon.Vicon("/home/nathaniel/git/Gait_Analysis_Toolkit/testing_data/stairclimb03.csv")
+fp = data.get_force_plate(1).get_forces() # pass in 1 or 2 to get the foce plates
+```
 
 
