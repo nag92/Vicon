@@ -1,14 +1,14 @@
 import Devices
-from lib.Exoskeleton.Robot import core
+from lib.GaitCore.Core.Point import Point
 
 class IMU(Devices.Devices):
 
     def __init__(self, name, sensor):
 
-        self._accel = core.Point(self.sensor["ACCX"],
+        self._accel = Point(self.sensor["ACCX"],
                                  self.sensor["ACCZ"],
                                  self.sensor["ACCY"])
-        self._gyro = core.Point(self.sensor["GYROX"],
+        self._gyro = Point(self.sensor["GYROX"],
                                  self.sensor["GYROZ"],
                                  self.sensor["GYROY"])
 

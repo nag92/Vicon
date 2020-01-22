@@ -1,4 +1,4 @@
-from lib.Exoskeleton.Robot import core
+import lib.GaitCore.Core as core
 
 class ModelOutput(object):
 
@@ -10,24 +10,24 @@ class ModelOutput(object):
 
         for side, joint in zip(("R", "L"), (left_joints, right_joints)):
             for output in self.joint_names:
-                angle = core.Point(data[side + output + "Angles"]["X"]["data"],
+                angle = core.Point.Point(data[side + output + "Angles"]["X"]["data"],
                                    data[side + output + "Angles"]["Y"]["data"],
                                    data[side + output + "Angles"]["Z"]["data"])
-                force = core.Point(data[side + output + "Force"]["X"]["data"],
+                force = core.Point.Point(data[side + output + "Force"]["X"]["data"],
                                    data[side + output + "Force"]["Y"]["data"],
                                    data[side + output + "Force"]["Z"]["data"])
-                moment = core.Point(data[side + output + "Moment"]["X"]["data"],
+                moment = core.Point.Point(data[side + output + "Moment"]["X"]["data"],
                                     data[side + output + "Moment"]["Y"]["data"],
                                     data[side + output + "Moment"]["Z"]["data"])
-                power = core.Point(data[side + output + "Power"]["X"]["data"],
+                power = core.Point.Point(data[side + output + "Power"]["X"]["data"],
                                    data[side + output + "Power"]["Y"]["data"],
                                    data[side + output + "Power"]["Z"]["data"])
 
-                joint[output] = core.Newton(angle, force, moment, power)
+                joint[output] = core.Newton.Newton(angle, force, moment, power)
 
-        left_leg = core.Leg(left_joints["Hip"], left_joints["Knee"], left_joints["Ankle"])
-        right_leg = core.Leg(right_joints["Hip"], right_joints["Knee"], right_joints["Ankle"])
-        self._legs = core.Side(left_leg, right_leg)
+        left_leg = core.Leg.Leg(left_joints["Hip"], left_joints["Knee"], left_joints["Ankle"])
+        right_leg = core.Leg.Leg(right_joints["Hip"], right_joints["Knee"], right_joints["Ankle"])
+        self._legs = core.Side.Side(left_leg, right_leg)
 
     def get_legs(self):
         """

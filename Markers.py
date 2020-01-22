@@ -1,4 +1,4 @@
-from lib.Exoskeleton.Robot import core
+import lib.GaitCore.Core as core
 import numpy as np
 from scipy.optimize import minimize
 import math
@@ -102,9 +102,9 @@ class Markers(object):
             z_filt = np.convolve(z_arr, np.ones((self._filter_window,)) / self._filter_window, mode='valid')
 
             for inx in xrange(len(x_filt)):
-                point = core.Point(x_arr[inx], y_arr[inx], z_arr[inx])
+                point = core.Point.Point(x_arr[inx], y_arr[inx], z_arr[inx])
                 self._raw_markers[fixed_name].append(point)
-                point = core.Point(x_filt[inx], y_filt[inx], z_filt[inx])
+                point = core.Point.Point(x_filt[inx], y_filt[inx], z_filt[inx])
                 self._filtered_markers[fixed_name].append(point)
 
     def smart_sort(self, filter=True):
@@ -319,7 +319,7 @@ def transform_markers(transforms, markers):
         for transform, frame in zip(transforms, marker):
             v = np.array([[frame.x, frame.y, frame.z, 1.0]]).T
             v_prime = np.dot(transform, v)
-            new_marker = core.Point(v_prime[0][0], v_prime[1][0], v_prime[2][0])
+            new_marker = core.Point.Point(v_prime[0][0], v_prime[1][0], v_prime[2][0])
             adjusted_locations.append(new_marker)
         trans_markers.append(adjusted_locations)
     return trans_markers
