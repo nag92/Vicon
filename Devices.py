@@ -1,11 +1,3 @@
-from collections import namedtuple
-
-Point = namedtuple('Point', 'x y z')
-Newton = namedtuple('Newton', 'angle force moment power')
-Data = namedtuple('Data', 'data time')
-Side = namedtuple("Side", "left right")
-Leg = namedtuple("Leg", "hip knee ankle" )
-
 class Devices(object):
 
     def __init__(self, name, sensor, type):
@@ -40,3 +32,6 @@ class Devices(object):
 
     def get_offset_index(self, dx):
         return dx * self.offset
+
+    def get(self):
+        pass

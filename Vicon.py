@@ -1,11 +1,11 @@
 import csv
+
 import Accel
 import EMG
 import ForcePlate
 import IMU
 import ModelOutput
 import Markers
-
 
 class Vicon(object):
 
@@ -26,7 +26,7 @@ class Vicon(object):
         self._make_IMUs()
         self._make_marker_trajs()
         self._make_model()
-        # self._length = len(self.get_model_output().get_right_joint("Hip").angle.x)
+        self._length = len(self.get_model_output().get_right_leg().hip.angle.x)
 
     def _find_number_of_frames(self, col):
         """
@@ -42,6 +42,10 @@ class Vicon(object):
             current_number = col[index]
 
         self.number_of_frames = col[index - 1]
+
+    @property
+    def markers(self):
+        return self._markers
 
     @property
     def length(self):
@@ -293,8 +297,8 @@ class Vicon(object):
         generate IMU models
         :return: None
         """
-        self.markers = Markers.Markers(self.data_dict["Trajectories"])
-        self.markers.make_markers()
+        self._markers = Markers.Markers(self.data_dict["Trajectories"])
+        self._markers.make_markers()
 
     def _make_Accelerometers(self):
         """
@@ -340,27 +344,33 @@ class Vicon(object):
         fitlered_col = [item for item in raw_col if not item.isdigit()]
         fitlered_col = filter(lambda a: a != 'Frame', fitlered_col)
         fitlered_col = filter(lambda a: a != "", fitlered_col)
+
+        if 'Devices' in fitlered_col:
+            fitlered_col = fitlered_col[fitlered_col.index("Devices"):]
+
         inx = []
         for name in fitlered_col:
             inx.append(raw_col.index(name))
+
         inx.append(len(raw_col))
         return fitlered_col, inx
 
-    def _fix_col_names(self, names):
+    def  _fix_col_names(self, names):
         fixed_names = []
         get_index = lambda x: x.index("Sensor") + 7
+
         for name in names:  # type: str
 
-            if "Subject" in name:
-                fixed = ''.join(
-                    [i for i in name.replace("Subject", "").replace(":", "").replace("|", "") if
-                     not i.isdigit()]).strip()
-                fixed_names.append(fixed)
+            # if "Subject".upper() in name.upper():
+            #     fixed = ''.join(
+            #         [i for i in name.replace("Subject", "").replace(":", "").replace("|", "") if
+            #          not i.isdigit()]).strip()
+            #     fixed_names.append(fixed)
 
-            elif  ":" in name:
-                print name
+            if ":" in name:
+
                 index = name.index(":")
-                print name[index+1:]
+
                 fixed_names.append(name[index+1:])
 
             elif "AMTI" in name:
@@ -441,6 +451,8 @@ class Vicon(object):
                     sub_value["data"].append(val)
 
         return data
+
+
 
 
 if __name__ == '__main__':

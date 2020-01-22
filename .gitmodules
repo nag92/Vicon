@@ -1,0 +1,3 @@
+[submodule "lib/GaitCore"]
+	path = lib/GaitCore
+	url = https://github.com/nag92/GaitCore.git
