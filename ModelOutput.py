@@ -1,4 +1,6 @@
 import lib.GaitCore.Core as core
+from lib.GaitCore.Bio.Leg import Leg
+from lib.GaitCore.Bio.Side import Side
 
 class ModelOutput(object):
 
@@ -25,9 +27,9 @@ class ModelOutput(object):
 
                 joint[output] = core.Newton.Newton(angle, force, moment, power)
 
-        left_leg = core.Leg.Leg(left_joints["Hip"], left_joints["Knee"], left_joints["Ankle"])
-        right_leg = core.Leg.Leg(right_joints["Hip"], right_joints["Knee"], right_joints["Ankle"])
-        self._legs = core.Side.Side(left_leg, right_leg)
+        left_leg = Leg(left_joints["Hip"], left_joints["Knee"], left_joints["Ankle"])
+        right_leg = Leg(right_joints["Hip"], right_joints["Knee"], right_joints["Ankle"])
+        self._legs = Side(left_leg, right_leg)
 
     def get_legs(self):
         """
