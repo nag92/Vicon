@@ -1,4 +1,4 @@
-import Devices
+from lib.Exoskeleton.Robot import core
 import numpy as np
 from scipy.optimize import minimize
 import math
@@ -58,7 +58,17 @@ class Markers(object):
 
     @filtered_markers.setter
     def rigid_body(self, value):
+        """"""
         self._rigid_body = value
+
+    def get_marker(self, key):
+        """
+
+        :param key: name of the marker key
+        :return: the value
+        """
+        # print self._filtered_markers.keys()
+        return self._filtered_markers[key]
 
     def make_markers(self):
         """
@@ -67,6 +77,7 @@ class Markers(object):
         """
 
         # TODO need to ensure that the frame are being created correctly and fill in missing data with a flag
+
         to_remove = [item for item in self._data_dict.keys() if "|" in item]
         to_remove += [item for item in self._data_dict.keys() if "Trajectory Count" == item]
         for rr in to_remove:
@@ -91,12 +102,12 @@ class Markers(object):
             z_filt = np.convolve(z_arr, np.ones((self._filter_window,)) / self._filter_window, mode='valid')
 
             for inx in xrange(len(x_filt)):
-                point = Devices.Point(x_arr[inx], y_arr[inx], z_arr[inx])
+                point = core.Point(x_arr[inx], y_arr[inx], z_arr[inx])
                 self._raw_markers[fixed_name].append(point)
-                point = Devices.Point(x_filt[inx], y_filt[inx], z_filt[inx])
+                point = core.Point(x_filt[inx], y_filt[inx], z_filt[inx])
                 self._filtered_markers[fixed_name].append(point)
 
-    def smart_sort(self, filter=False):
+    def smart_sort(self, filter=True):
         """
         Gather all the frames and attempt to sort the markers into the rigid markers
         :return:
@@ -110,6 +121,7 @@ class Markers(object):
             markers_keys.sort()
             markers = []
             for marker in markers_keys:
+
                 if filter:
                     markers.append(self._filtered_markers[marker])
                 else:
@@ -170,7 +182,7 @@ class Markers(object):
         for name, value in self._rigid_body.iteritems():
             frames = []
             if name in bodies:
-                print name
+
                 for ii in xrange(len(value[0])):
                         frames.append(cloud_to_cloud(bodies[name], [value[0][ii], value[1][ii], value[2][ii], value[3][ii]])[0])
                 self.add_frame(name, frames)
@@ -189,7 +201,7 @@ class Markers(object):
         :param name:
         :return:
         """
-        print self._rigid_body.keys()
+
         return self._rigid_body[name]
 
     def calc_joint_center(self, parent_name, child_name, start, end):
@@ -282,7 +294,7 @@ class Markers(object):
         :param centers:
         :return:
         """
-        print frame
+
         self._ax.clear()
         self._ax.set_xlabel('X Label')
         self._ax.set_ylabel('Y Label')
@@ -307,11 +319,10 @@ def transform_markers(transforms, markers):
         for transform, frame in zip(transforms, marker):
             v = np.array([[frame.x, frame.y, frame.z, 1.0]]).T
             v_prime = np.dot(transform, v)
-            new_marker = Devices.Point(v_prime[0][0], v_prime[1][0], v_prime[2][0])
+            new_marker = core.Point(v_prime[0][0], v_prime[1][0], v_prime[2][0])
             adjusted_locations.append(new_marker)
         trans_markers.append(adjusted_locations)
     return trans_markers
-
 
 def make_frame(markers):
     """
@@ -455,13 +466,12 @@ def calc_AoR(markers):
 
 
     :type markers: list
-    :param markers: list of markers, each marker is a list of Devices.Exoskeleton.Points
+    :param markers: list of markers, each marker is a list of core.Exoskeleton.Points
     :return: axis of rotation
     :rtype np.array
     """
     A = calc_A(markers)  # calculates the A matrix
-    E_vals, E_vecs = np.linalg.eig(
-        A)  # I believe that the np function eig has a different output than the matlab function eigs
+    E_vals, E_vecs = np.linalg.eig(A)  # I believe that the np function eig has a different output than the matlab function eigs
     min_E_val_idx = np.argmin(E_vals)
     axis = E_vecs[:, min_E_val_idx]
     return axis
@@ -767,11 +777,11 @@ def fit_to_plane(points):
 
 
 if __name__ == '__main__':
-    DataSets1 = [Devices.Point(531.6667, - 508.9951, 314.4273),
-                 Devices.Point(510.5082, - 457.7791, 357.1969),
-                 Devices.Point(463.9945, - 476.0904, 356.1137),
-                 Devices.Point(552.4579, - 566.4891, 393.5611),
-                 Devices.Point(505.9442, - 584.8004, 392.4779)]
+    DataSets1 = [core.Point(531.6667, - 508.9951, 314.4273),
+                 core.Point(510.5082, - 457.7791, 357.1969),
+                 core.Point(463.9945, - 476.0904, 356.1137),
+                 core.Point(552.4579, - 566.4891, 393.5611),
+                 core.Point(505.9442, - 584.8004, 392.4779)]
 
     DataSets2 = [[-55.4398, 406.9759, - 487.4170],
                  [-117.4716, 384.3339, -510.7755],
@@ -779,11 +789,11 @@ if __name__ == '__main__':
                  [-84.8805, 394.2636, - 393.6067],
                  [-67.3354, 347.3059, - 393.7805]]
 
-    marker = [Devices.Point(0.0, 50.0, 0.0),
-              Devices.Point(-70.0, 50.0, 0.0),
-              Devices.Point(-70, 0, 0),
-              Devices.Point(0.0, 50.0, 100.0),
-              Devices.Point(0.0, 0.0, 100.0)]
+    marker = [core.Point(0.0, 50.0, 0.0),
+              core.Point(-70.0, 50.0, 0.0),
+              core.Point(-70, 0, 0),
+              core.Point(0.0, 50.0, 100.0),
+              core.Point(0.0, 0.0, 100.0)]
 
     # print cloudtocloud(marker, DataSets1)
 
