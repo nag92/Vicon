@@ -3,24 +3,18 @@
 A package to read in Vicon data for analysis. This package can be used to read in a CSV file generated from 
 the Vicon motion capture system
 
-## NOTE
+## IMPORTANT NOTE
 There is a strange bug when reading in the file. It will throw and error if you try to read in the raw file. 
 To solve this problem. Open up the CSV file in libreoffice or Excel and resave the file. Make sure its a CSV file. 
 
-## How to use
-
-## Namped tuples
-This package used named tuples for easy and consitant access. The has the following namped tuples. 
-```python
-Point = namedtuple('Point', 'x y z')
-Newton = namedtuple('Newton', 'angle force moment power')
-Data = namedtuple('Data', 'data time')
-Side = namedtuple("Side", "left right")
-Leg = namedtuple("Leg", "hip knee ankle" )
-
+## Installation
+This package relays on a submodule that needs to be installed
+```bash
+git clone https://github.com/nag92/Vicon.git
+cd Vicon
+git submodule init
+git submodule update
 ```
-
-
 
 ### Playing the markers
 
