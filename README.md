@@ -87,7 +87,7 @@ from Vicon import Vicon
 file = "path to CSV file"
 data = Vicon.Vicon(file)
 model = data.get_model_output()
-model.get_left_leg().hip.angle.x
+model.left_leg().hip.angle.x
 ```
 
 ### Get force plates

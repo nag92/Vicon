@@ -1,6 +1,6 @@
 import lib.GaitCore.Core as core
 from lib.GaitCore.Bio.Leg import Leg
-from lib.GaitCore.Bio.Side import Side
+from lib.GaitCore.Bio.Joint import Joint
 
 class ModelOutput(object):
 
@@ -10,7 +10,7 @@ class ModelOutput(object):
         left_joints = {}
         right_joints = {}
 
-        for side, joint in zip(("R", "L"), (left_joints, right_joints)):
+        for side, joint in zip(("L", "R"), (left_joints, right_joints)):
             for output in self.joint_names:
                 angle = core.Point.Point(data[side + output + "Angles"]["X"]["data"],
                                    data[side + output + "Angles"]["Y"]["data"],
@@ -25,31 +25,23 @@ class ModelOutput(object):
                                    data[side + output + "Power"]["Y"]["data"],
                                    data[side + output + "Power"]["Z"]["data"])
 
-                joint[output] = core.Newton.Newton(angle, force, moment, power)
+                joint[output] = Joint(angle, moment, power, force)
+                #joint[output] = core.Newton.Newton(angle, force, moment, power)
 
-        left_leg = Leg(left_joints["Hip"], left_joints["Knee"], left_joints["Ankle"])
-        right_leg = Leg(right_joints["Hip"], right_joints["Knee"], right_joints["Ankle"])
-        self._legs = Side(left_leg, right_leg)
-
-    def get_legs(self):
-        """
-
-        :return:
-        """
-        return self._legs
+        self._left_leg = Leg(left_joints["Hip"], left_joints["Knee"], left_joints["Ankle"])
+        self._right_leg = Leg(right_joints["Hip"], right_joints["Knee"], right_joints["Ankle"])
 
     def get_right_leg(self):
         """
 
         :return:
         """
-        return self._legs.right
+        return self._right_leg
 
     def get_left_leg(self):
         """
 
         :return:
         """
-        return self._legs.left
-
+        return self._left_leg
 
