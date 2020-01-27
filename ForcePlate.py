@@ -12,7 +12,17 @@ class ForcePlate(Devices.Devices):
         super(ForcePlate, self).__init__(name, sensor, "IMU")
 
     def get_forces(self):
+        """
+
+        :return: the force from the force plate
+        :rtype: Point
+        """
         return self._sensor.force
 
     def get_moments(self):
+        """
+
+        :return: the Moment from the force plate
+        :rtype: Point
+        """
         return self._sensor.moment

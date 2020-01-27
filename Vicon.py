@@ -11,7 +11,6 @@ class Vicon(object):
 
     def __init__(self, file_path):
         self._file_path = file_path
-        self.output_names = ["Devices", "Joints", "Model Outputs", "Segments", "Trajectories"]
         self.joint_names = ["Ankle", "Knee", "Hip"]
         self._number_of_frames = 0
         self._T_EMGs = {}
@@ -19,7 +18,7 @@ class Vicon(object):
         self._force_plates = {}
         self._IMUs = {}
         self._accels = {}
-        self.data_dict = self.open_vicon_file(self._file_path, self.output_names)
+        self.data_dict = self.open_vicon_file(self._file_path)
         self._make_Accelerometers()
         self._make_EMGs()
         self._make_force_plates()
@@ -316,7 +315,7 @@ class Vicon(object):
         else:
             print "No Devices"
 
-    def open_vicon_file(self, file_path, output_names):
+    def open_vicon_file(self, file_path):
         """
         parses the Vicon sensor data into a dictionary
         :param file_path: file path

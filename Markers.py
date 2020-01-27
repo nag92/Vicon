@@ -32,7 +32,7 @@ class Markers(object):
     def marker_names(self):
         """
         :return marker names
-        :return:
+        :return: None
         """
         return self._marker_names
 
@@ -58,7 +58,11 @@ class Markers(object):
 
     @filtered_markers.setter
     def rigid_body(self, value):
-        """"""
+        """
+
+        :param value: value to set rigid marker
+        :return: rigid marker
+        """
         self._rigid_body = value
 
     def get_marker(self, key):
@@ -67,7 +71,7 @@ class Markers(object):
         :param key: name of the marker key
         :return: the value
         """
-        # print self._filtered_markers.keys()
+
         return self._filtered_markers[key]
 
     def make_markers(self):
@@ -89,7 +93,7 @@ class Markers(object):
             self._raw_markers[fixed_name] = []
             self._filtered_markers[fixed_name] = []
 
-            # TODO improve this shit
+            # This removes some of the values that are not very useful
             if value_name.keys()[0] == "Magnitude( X )" or value_name.keys()[0] == "Count":
                 continue
 
@@ -97,10 +101,12 @@ class Markers(object):
             y_arr = value_name["Y"]["data"]
             z_arr = value_name["Z"]["data"]
 
+            # smooth the markers
             x_filt = np.convolve(x_arr, np.ones((self._filter_window,)) / self._filter_window, mode='valid')
             y_filt = np.convolve(y_arr, np.ones((self._filter_window,)) / self._filter_window, mode='valid')
             z_filt = np.convolve(z_arr, np.ones((self._filter_window,)) / self._filter_window, mode='valid')
 
+            # save a copy of both the unfiltered and fitlered markers
             for inx in xrange(len(x_filt)):
                 point = core.Point.Point(x_arr[inx], y_arr[inx], z_arr[inx])
                 self._raw_markers[fixed_name].append(point)
@@ -110,6 +116,7 @@ class Markers(object):
     def smart_sort(self, filter=True):
         """
         Gather all the frames and attempt to sort the markers into the rigid markers
+        :param filter: use the filtered values or the none fitlered values
         :return:
         """
         no_digits = [''.join(x for x in i if not x.isdigit()) for i in self._marker_names]  # removes digits
@@ -156,7 +163,7 @@ class Markers(object):
 
     def add_frame(self, name, frame):
         """
-
+        add a fame to a the dictionary
         :param name: name for the dictionary
         :param frame: frame to add the dictionary
         :return:
@@ -176,7 +183,7 @@ class Markers(object):
     def auto_make_transform(self, bodies):
         """
         make the frames using the cloud method
-        :param bodies:
+        :param bodies: list transformation
         :return:
         """
         for name, value in self._rigid_body.iteritems():
@@ -190,16 +197,16 @@ class Markers(object):
     def get_frame(self, name):
         """
         get a frame
-        :param name:
-        :return:
+        :param name: name of the frame
+        :return: frame
         """
         return self._frames[name]
 
     def get_rigid_body(self, name):
         """
 
-        :param name:
-        :return:
+        :param name: name of rigid body
+        :return: transformation of the rigid body
         """
 
         return self._rigid_body[name]
@@ -232,10 +239,10 @@ class Markers(object):
 
     def play(self, joints=None, save=False, name="im"):
         """
-        play the markers
-        :param joints:
-        :param save:
-        :return:
+        play an animation of the         markers
+        :param joints: opital param for joint centers
+        :param save: bool to save the animation
+        :return: name of file
         """
 
         x_total = []
@@ -287,11 +294,11 @@ class Markers(object):
     def __animate(self, frame, x, y, z, centers=None):
         """
 
-        :param frame:
-        :param x:
-        :param y:
-        :param z:
-        :param centers:
+        :param frame: interation frame
+        :param x:array of x data
+        :param y: array of y data
+        :param z: array of z data
+        :param centers:optioanl data
         :return:
         """
 
@@ -327,7 +334,9 @@ def transform_markers(transforms, markers):
 def make_frame(markers):
     """
     Create a frame based on the marker layout
-    :param markers:
+    Creates a marker assuming a certain layout,
+    DEPTRICATED
+    :param markers: array of markers
     :return:
     """
     origin = markers[0]
@@ -364,9 +373,11 @@ def get_all_transformation_to_base(parent_frames, child_frames):
 def get_transform_btw_two_frames(parent_frame, child_frame):
     """
 
-    :param parent_frame:
-    :param child_frame:
-    :return:
+    :param parent_frame: parent frame
+    :param child_frame: child frame
+    :type parent_frame: np.array
+    :type child_frame: np.array
+    :return: transformation frame
     """
     return np.linalg.inv(parent_frame) * child_frame
 
@@ -377,7 +388,7 @@ def get_angle_between_vects(v1, v2):
     https://stackoverflow.com/questions/2827393/angles-between-two-n-dimensional-vectors-in-python/13849249#13849249
     :param v1: vector 1
     :param v2: vector 2
-    :return:
+    :return: cross product of the vectors
     """
     v1_u = unit_vector(v1)
     v2_u = unit_vector(v2)
@@ -415,8 +426,9 @@ def batch_transform_vector(frames, vector):
 def unit_vector(vector):
     """
     Returns the unit vector of the vector.
-    :param vector:
-    :return:
+    :param vector: list of points
+    :return: norm of points
+    :type vector: np.array
     """
     return vector / np.linalg.norm(vector)
 
@@ -448,8 +460,8 @@ def calc_CoR(markers):
         by Sahan S. Hiniduma
     '''
 
-    A = calc_A(markers)
-    b = calc_b(markers)
+    A = __calc_A(markers)
+    b = __calc_b(markers)
     Ainv = np.linalg.pinv(2.0 * A)
     return np.dot(Ainv, b)
 
@@ -470,14 +482,14 @@ def calc_AoR(markers):
     :return: axis of rotation
     :rtype np.array
     """
-    A = calc_A(markers)  # calculates the A matrix
+    A = __calc_A(markers)  # calculates the A matrix
     E_vals, E_vecs = np.linalg.eig(A)  # I believe that the np function eig has a different output than the matlab function eigs
     min_E_val_idx = np.argmin(E_vals)
     axis = E_vecs[:, min_E_val_idx]
     return axis
 
 
-def calc_A(markers):
+def __calc_A(markers):
     """
 
     :param markers: array of markers
@@ -496,8 +508,9 @@ def calc_A(markers):
     return A
 
 
-def calc_b(markers):
+def __calc_b(markers):
     """
+    Function to work with calc_AoR and calc_CoR
 
     :param markers: array of markers
     :return: b array
@@ -523,9 +536,14 @@ def cloud_to_cloud(A_, B_):
     """
     Get the transformation between two frames of marker sets.
     http://nghiaho.com/?page_id=671
-    :param A_: ,rigid body markers set
+    :param A_: rigid body markers set
+                Example: [core.Point(0.0, 50.0, 0.0),
+                          core.Point(-70.0, 50.0, 0.0),
+                          core.Point(-70, 0, 0),
+                          core.Point(0.0, 50.0, 100.0)]
+
     :param B_: currnet position of the markers
-    :return:
+    :return: transformation matrix and RSME error
     """
     A = np.asmatrix(points_to_matrix(A_))
     B = np.asmatrix(points_to_matrix(B_))
@@ -575,9 +593,9 @@ def cloud_to_cloud(A_, B_):
 def get_center(markers, R):
     """
     Get the marker set
-    :param markers:
-    :param R:
-    :return:
+    :param markers: List of markers
+    :param R: Rotation matix
+    :return: transformed point
     """
 
     x1 = np.array((markers[0][0].x, markers[0][0].y, markers[0][0].z)).reshape((-1, 1))
@@ -590,11 +608,14 @@ def get_center(markers, R):
 def minimize_center(vectors, axis, initial):
     """
     Optimize the center of the rotation of the axis by finding the closest point
-    in the line to the frames
-    :param vectors:
-    :param axis:
-    :param initial:
-    :return:
+    in the line to the frames. This method uses a lest squares operation
+    :param vectors: list of vector
+    :param axis: axis to search on
+    :param initial: interital guess
+    :type vectors: List
+    :type axis: List
+    :type initial: List
+    :return: optimized center
     """
 
     def objective(x):
@@ -619,8 +640,8 @@ def minimize_center(vectors, axis, initial):
 def calc_mass_vect(markers):
     """
     find the average vector to  frame
-    :param markers:
-    :return:
+    :param markers: list of points
+    :return: center of the markers
     """
     x = 0
     y = 0
@@ -649,9 +670,11 @@ def calc_vector_between_points(start_point, end_point):
 def get_distance(point1, point2):
     """
     Get the distance between two points
+    :type point1: Point
+    :type point2l Point
     :param point1: first point
     :param point2: secound point
-    :return:
+    :return: distance between two Points
     """
     return np.sum(np.sqrt(np.power(calc_vector_between_points(point1, point2), 2)))
 
@@ -694,8 +717,8 @@ def R_to_axis_angle(matrix):
 def sphereFit(frames):
     """
     Fit a sphere to a serise of transformations
-    :param frames:
-    :return:
+    :param frames: list of frames
+    :return: raduis and center of rotation
     """
     spX = []
     spY = []

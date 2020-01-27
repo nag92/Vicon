@@ -1,10 +1,17 @@
 class Devices(object):
 
-    def __init__(self, name, sensor, type):
+    def __init__(self, name, sensor, type, offest=20):
+        """
+        Base class for Device connected to the Vicon
+        :param name: name of sensor
+        :param sensor: data
+        :param type: type of sensor
+        :param offest: offset for values if recording at a higher rate then the markers
+        """
         self._name = name
         self._sensor = sensor
         self.type = type
-        self.offset = 20
+        self.offset = offest
 
     @property
     def name(self):
@@ -33,5 +40,4 @@ class Devices(object):
     def get_offset_index(self, dx):
         return dx * self.offset
 
-    def get(self):
-        pass
+
