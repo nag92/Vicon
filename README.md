@@ -7,6 +7,11 @@ the Vicon motion capture system
 There is a strange bug when reading in the file. It will throw and error if you try to read in the raw file. 
 To solve this problem. Open up the CSV file in libreoffice or Excel and resave the file. Make sure its a CSV file. 
 
+
+# Notes
+- subject prefix removed from marker name i.e (subject:RKNEE -> RKNEE)
+- New devices connected to the Vicon should extend the Device class
+
 ## Installation
 This package relays on a submodule that needs to be installed
 ```bash
@@ -96,7 +101,6 @@ model.left_leg().hip.angle.x
 from Vicon import Vicon
 file = "path to CSV file"
 data = Vicon.Vicon(file)
-data = Vicon.Vicon("/home/nathaniel/git/Gait_Analysis_Toolkit/testing_data/stairclimb03.csv")
 fp = data.get_force_plate(1).get_forces() # pass in 1 or 2 to get the foce plates
 ```
 
